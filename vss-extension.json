@@ -1,0 +1,55 @@
+{
+    "manifestVersion": 1,
+    "id": "tfs-visualizer-extension",
+    "version": "0.1.128",
+    "name": "TFS Visualizer Extensions",
+    "description": "An extension that provides analytics on the throughput and statuses of projects.",
+    "publisher": "sheldonnunes",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+            }
+        ],
+    "icons": {
+        "default": "static/images/logo.png"
+     },
+    "contributions": [
+        {
+            "id": "sheldonnunes.visualizer",
+            "type": "ms.vss-web.hub",
+            "description": "Adds a Visualizer hub to the Work hub group.",
+            "targets": [
+                "ms.vss-work-web.work-hub-group"
+                ],
+            "properties": {
+                "name": "TFS Visualizer",
+                "order": 99,
+                "uri": "static/tfs-visualizer.html"
+            }
+        }
+    ],
+    "scopes": [
+        "vso.work"
+    ],
+    "files": [
+        {
+            "path": "static/tfs-visualizer.html", "addressable": true
+        },
+        {
+            "path": "static/style.css", "addressable": true
+        },
+        {
+            "path": "dist",
+            "addressable": true,
+            "packagePath": "scripts"
+        },
+        {
+            "path": "node_modules/vss-web-extension-sdk/lib",
+            "addressable": true,
+            "packagePath": "lib"
+        },
+        {
+            "path": "static/images/logo.png", "addressable": true
+        }
+    ]
+}

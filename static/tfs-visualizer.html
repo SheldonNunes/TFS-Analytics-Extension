@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>TFS Visualizer</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="../lib/VSS.SDK.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
+</head>
+<body>
+    <script>
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true
+        });
+
+        VSS.ready(function () {
+            require(["scripts/app"], function () {
+                VSS.notifyLoadSucceeded();
+            });
+        });
+    </script>
+    <h1>TFS Visualizer</h1>
+    <div class="row">
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+    <!-- <script src="../dist/app.js"></script> -->
+</body>
+</html>
