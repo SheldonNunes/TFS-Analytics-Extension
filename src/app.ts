@@ -1,6 +1,6 @@
 /// <reference path="../node_modules/@types/chart.js/index.d.ts" />
 import TFSClient = require("TFS/WorkItemTracking/RestClient");
-import WorkItemExpand = require("TFS/Work/Contracts");
+import Contracts = require("TFS/WorkItemTracking/Contracts");
 declare var Chart: any;
 
 interface ITFSItem {
@@ -105,13 +105,23 @@ class TFSVisualizer {
         return this._httpClient;
     }
 
+    private getWorkItemOrdering(workItemType){
+        if(workItemType === "Feature")
+            return 0;
+        if(workItemType === "Product Backlog Item" || workItemType === "Bug")
+            return 1;
+        if(workItemType === "Task")
+            return 2;
+    }
+
     public visualize(){
+        var that = this;
         var tree = new Tree(new TreeNode('TFS'));
         var projectId = VSS.getWebContext().project.id;
 
         // Retrieves the Work Item Tracking REST client
         var workItemQuery = {
-            query: "SELECT Microsoft.VSTS.Scheduling.RemainingWork FROM WorkItem ORDER BY [System.Id] ASC" 
+            query: "SELECT * FROM WorkItem ORDER BY [System.Id] ASC" 
         };
 
         var tfsItems = [];
@@ -121,91 +131,65 @@ class TFSVisualizer {
             var workItemIds = result.workItems.map(function (wi) { return wi.id });                
             this.httpClient.getWorkItems(workItemIds, null, null, 4).then(
                 (function (workItems) {
-                    var workItemLinksQuery = {       
-                        query: "select [System.Id] from WorkItemLinks where ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') order by [System.Id] ASC"
+                    workItems.sort(function(a,b) {
+                        return that.getWorkItemOrdering(a.fields["System.WorkItemType"]) - that.getWorkItemOrdering(b.fields["System.WorkItemType"])
+                    });
+                    workItems.forEach(function(workItem : Contracts.WorkItem, index){
+                        if(workItem.fields["System.WorkItemType"] === "Feature"){
+                            tree.add(workItem, 'TFS', tree.traverseBF);
+                        } else {
+                            var parentWorkItem = workItems.find(function(item){
+                                if(workItem.relations === undefined)
+                                    return false;
+                                // array 0 is the Reverse                                
+                                var id = workItem.relations[0].url.split('/').pop();
+                                return item.id === parseInt(id);
+                            });
+                            tree.add(workItem, parentWorkItem, tree.traverseBF)
+                        }
+                    })
+                    
+                    var stateDictionary : any = {};
+                    const callback = (node:TreeNode) => {
+                        var workItem:Contracts.WorkItem = node.data;
+                        if(stateDictionary[workItem.fields["System.State"]] != null){
+                            stateDictionary[workItem.fields["System.State"]]++;
+                        } else {
+                            stateDictionary[workItem.fields["System.State"]] = 1;
+                        }
                     };
 
-                    this.httpClient.queryByWiql(workItemLinksQuery, projectId).then(
-                    function(workItemLinks) {
-                        workItemLinks.workItemRelations.forEach(function(workItemLink, index){
-                            var item = workItems.find(function(item){
-                                return item.id === workItemLink.target.id
-                            });
+                    var feature : Tree = new Tree(tree._root.children[0])
+                    feature.traverseBF(callback);
+                    
+                    var chartDataSet : Chart.ChartDataSets = {
+                        label: feature._root.data.fields["System.Title"],
+                        data: Object.values(stateDictionary)
+                    }
 
-                            var tfsItem : ITFSItem ={
-                                id: item.id,
-                                title: item.fields["System.Title"],
-                                workItemType: item.fields["System.WorkItemType"],
-                                state: item.fields["System.State"],
-                                estimate: item.fields["Microsoft.VSTS.Scheduling.RemainingWork"]//item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"]
-                            };
+                    var chartData : Chart.ChartData = {
+                        labels: Object.keys(stateDictionary),
+                        datasets: [chartDataSet]
+                    } 
 
-                            if(tfsItem.workItemType === "Feature")
-                            {
-                                tree.add(tfsItem, 'TFS', tree.traverseBF);
-                            } else if (workItemLink.source != null){
-                                var parentItem = workItems.find(function(item){
-                                    return item.id === workItemLink.source.id
-                                }) 
+                    var chartTickOptions : Chart.LinearTickOptions = {
+                        beginAtZero:true
+                    }
 
-                                var parentItemTest : ITFSItem = {
-                                    id: parentItem.id,
-                                    title: parentItem.fields["System.Title"],
-                                    workItemType: parentItem.fields["System.WorkItemType"],
-                                    state: item.fields["System.State"],
-                                    estimate: item.fields["Microsoft.VSTS.Scheduling.RemainingWork"]//item.fields["Microsoft.VSTS.Scheduling.OriginalEstimate"]
-                                };
-
-                                tree.add(tfsItem, parentItemTest, tree.traverseBF)
-                            }
-                        });
-
-                        console.log(tree);
-
-                        var stateDictionary : any = {};
-                        const callback = node => {
-                            if(stateDictionary[node.data.state] != null){
-                                stateDictionary[node.data.state]++;
-                            } else {
-                                stateDictionary[node.data.state] = 1;
-                            }
-                        };
-
-                        var feature : Tree = new Tree(tree._root.children[0])
-                        feature.traverseBF(callback);
-
-                        console.log(feature);
-                        console.log(stateDictionary);
-                        
-                        var chartDataSet : Chart.ChartDataSets = {
-                            label: feature._root.data.title,
-                            data: Object.values(stateDictionary)
-                        }
-
-                        var chartData : Chart.ChartData = {
-                            labels: Object.keys(stateDictionary),
-                            datasets: [chartDataSet]
-                        } 
-    
-                        var chartTickOptions : Chart.LinearTickOptions = {
-                            beginAtZero:true
-                        }
-
-                        var myChart: any = document.getElementById("myChart");
-                        var ctx = myChart.getContext('2d');
-                        var chart = 
-                            new Chart(ctx,
-                                { type: "bar",
-                                data: chartData,
-                                options: {
-                                    scales: {
-                                        yAxes: [{
-                                            ticks: chartTickOptions
-                                        }]
-                                        }
+                    var myChart: any = document.getElementById("myChart");
+                    var ctx = myChart.getContext('2d');
+                    var chart = 
+                        new Chart(ctx,
+                            { type: "bar",
+                            data: chartData,
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: chartTickOptions
+                                    }]
                                     }
-                                })
-                    });
+                                }
+                            })
                 }).bind(this)); 
         }).bind(this));    
     }
