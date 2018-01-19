@@ -1,4 +1,73 @@
-.chart-container {
-    width: 500px;
-    height: 500px;
+body {
+    font-family: 'Raleway', sans-serif !important;
+    overflow-y: auto;
 }
+
+ul {
+    list-style-type: none;
+}
+
+#myChart {
+    height: 100%;
+}
+
+#myChartPercentageIndicator {
+    position: absolute;
+    margin: 0;
+    margin: none;
+    padding: none;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3em;
+}
+
+.row {
+    margin: auto 40px;
+}
+
+.container {
+    background-color: #f1f1f1;
+    margin: auto 10px;
+    height: 100%;
+    padding: 20px;
+    width: 100%;
+}
+
+.container--thirtypercentwidth {
+    width: 30%;
+}
+
+.container--seventypercentwidth {
+    width: 70%;
+}
+
+.container--halfwidth {
+    width: 50%;
+}
+
+.summaryPoints {
+    font-size: 2em;
+}
+
+.chart {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+}
+
+.chart-container {
+    width: 50%;
+    height: 100%;
+}
+
+.dataRowContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 350px;
+    margin-bottom: 20px;
+}
+

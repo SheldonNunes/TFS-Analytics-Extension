@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "tfs-visualizer-extension",
-    "version": "0.1.148",
+    "version": "0.1.171",
     "name": "TFS Visualizer Extensions",
     "description": "An extension that provides analytics on the throughput and statuses of projects.",
     "publisher": "sheldonnunes",

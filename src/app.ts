@@ -149,49 +149,66 @@ class TFSVisualizer {
                         }
                     })
                     
-                    var stateDictionary : any = {};
+                    var stateDictionary : any = {
+                        NotCompleted: 0,
+                        Completed: 0,
+                        New: 0,
+                        "In Progress": 0,
+
+                    };
+
                     const callback = (node:TreeNode) => {
-                        var workItem:Contracts.WorkItem = node.data;
-                        if(stateDictionary[workItem.fields["System.State"]] != null){
-                            stateDictionary[workItem.fields["System.State"]]++;
+                        if(node.data == "TFS")
+                            return;
+                        var workItemState = node.data.fields["System.State"];
+                        stateDictionary[workItemState]++;
+
+                        if(workItemState === "Done" || workItemState === "Closed") 
+                        {
+                            stateDictionary.Completed++;
                         } else {
-                            stateDictionary[workItem.fields["System.State"]] = 1;
+                            stateDictionary.NotCompleted++;
                         }
                     };
 
-                    var feature : Tree = new Tree(tree._root.children[0])
-                    feature.traverseBF(callback);
+                    tree.traverseBF(callback);
                     
                     var chartDataSet : Chart.ChartDataSets = {
-                        label: feature._root.data.fields["System.Title"],
-                        data: Object.values(stateDictionary)
-                    }
+                        label: "Progress",// tree._root.data,//tree._root.data.fields["System.Title"],
+                        data: [stateDictionary.Completed, stateDictionary.NotCompleted ],
+                        backgroundColor: ['rgba(51, 216, 20, 0.70)', 'rgba(109, 109, 109, 0.25)'] 
+                    };
 
                     var chartData : Chart.ChartData = {
-                        labels: Object.keys(stateDictionary),
+                        labels: ["Completed", "Not Completed"],
                         datasets: [chartDataSet]
-                    } 
+                    };
 
                     var chartTickOptions : Chart.LinearTickOptions = {
                         beginAtZero:true
-                    }
+                    };
 
                     var myChart: any = document.getElementById("myChart");
                     var ctx = myChart.getContext('2d');
-                    var chart = 
-                        new Chart(ctx,
-                            { type: "bar",
+                    var chart = new Chart(ctx,
+                            { type: "doughnut",
                             data: chartData,
                             options: {
-                                scales: {
-                                    yAxes: [{
-                                        ticks: chartTickOptions
-                                    }]
-                                    }
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false
                                 }
-                            })
+                            }
+                        });
                 }).bind(this)); 
         }).bind(this));    
+    }
+
+    
+
+
+    public getItemStateGraph(tfsTree){
+        
     }
 }
 

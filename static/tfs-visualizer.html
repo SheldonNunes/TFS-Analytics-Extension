@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>TFS Visualizer</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">    
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="../lib/VSS.SDK.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
@@ -21,10 +22,32 @@
     </script>
     <h1>TFS Visualizer</h1>
     <div class="row">
-        <div class="chart-container">
-            <canvas id="myChart"></canvas>
+        <div class="dataRowContainer">
+            <div class="container container--seventypercentwidth">
+                <div class="initiative-summary">
+                    <h2>Initiative Name</h2>
+                    <ul class="summaryPoints">
+                        <li>Total Features: <span id="totalFeatures"/></li>
+                        <li>Total Work Items: <span id="totalWorkItems"/></li>
+                        <li>Total Tasks: <span id="totalTasks"/></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container container--thirtypercentwidth">
+                <div class="chart">
+                    <p id="myChartPercentageIndicator">10%</p>
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
         </div>
+
+        <div class="dataRowContainer">
+                <div class="container--fullWidth">
+                    <div class="chart">
+                        <canvas id="otherChart"></canvas>
+                    </div>
+                </div>
+            </div>
     </div>
-    <!-- <script src="../dist/app.js"></script> -->
 </body>
 </html>
