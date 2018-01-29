@@ -1,6 +1,10 @@
 /// <reference path="../node_modules/@types/chart.js/index.d.ts" />
-import TFSClient = require("TFS/WorkItemTracking/RestClient");
+/// <reference types="vss-web-extension-sdk" />
+
+import Tfs_Work_WebApi = require("TFS/Work/RestClient");
+import WorkItemTrackingClient = require("TFS/WorkItemTracking/RestClient");
 import Contracts = require("TFS/WorkItemTracking/Contracts");
+import { WorkItem } from "TFS/WorkItemTracking/Contracts";
 declare var Chart: any;
 
 interface ITFSItem {
@@ -35,6 +39,7 @@ class Queue {
         return deletedData;
     }
 }
+
 
 class TreeNode {
     data = null;
@@ -95,26 +100,76 @@ class Tree {
     }
 }
 
-class TFSVisualizer {
-    private _httpClient: TFSClient.WorkItemTrackingHttpClient4;
-    public get httpClient(): TFSClient.WorkItemTrackingHttpClient4 {
+function makeUL(array) {
+    // Create the list element:
+    var list = document.createElement('ul');
+
+    for(var i = 0; i < array.length; i++) {
+        // Create the list item:
+        var item = document.createElement('li');
+
+        // Set its contents:
+        item.appendChild(document.createTextNode(array[i]));
+
+        // Add it to the list:
+        list.appendChild(item);
+    }
+
+    // Finally, return the constructed list:
+    return list;
+}
+
+class ProcessRetriever {
+    public getProcess(){
+        let workClient = WorkItemTrackingClient.getClient();
+        var projectId = VSS.getWebContext().project.id;
+        workClient.getWorkItemTypeCategories(projectId).then(
+            (function(result) {
+                var test = result;
+            })
+        );
+    }
+}
+
+class WorkItemRetriever {
+    private _httpClient: WorkItemTrackingClient.WorkItemTrackingHttpClient4;
+    public get httpClient(): WorkItemTrackingClient.WorkItemTrackingHttpClient4 {
         if (!this._httpClient) {
-            this._httpClient = TFSClient.getClient();
+            this._httpClient = WorkItemTrackingClient.getClient();
         }
     
         return this._httpClient;
     }
 
+
     private getWorkItemOrdering(workItemType){
-        if(workItemType === "Feature")
+        if(workItemType === "Epic")
             return 0;
-        if(workItemType === "Product Backlog Item" || workItemType === "Bug")
+        if(workItemType === "Feature")
             return 1;
-        if(workItemType === "Task")
+        if(workItemType === "Product Backlog Item" || workItemType === "Bug")
             return 2;
+        if(workItemType === "Task")
+            return 3;
     }
 
-    public visualize(){
+    public getEpicCategoryItems(){
+        var projectId = VSS.getWebContext().project.id;
+        var initiatiesQuery = {
+            query: "SELECT * FROM WorkItem WHERE [System.WorkItemType] IN GROUP 'Microsoft.EpicCategory' ORDER BY [System.Id] ASC" 
+        };
+
+        var that = this;
+        return new Promise<Contracts.WorkItem[]>(function(resolve, reject) {
+            that.httpClient.queryByWiql(initiatiesQuery, projectId).then(function(result){
+                var ids = result.workItems.map(function (wi) { return wi.id });  
+                //Needs work
+                resolve(that.httpClient.getWorkItems(ids, null, null, 1));
+            });
+        });
+    }
+
+    public getWorkItems(){
         var that = this;
         var tree = new Tree(new TreeNode('TFS'));
         var projectId = VSS.getWebContext().project.id;
@@ -123,7 +178,7 @@ class TFSVisualizer {
         var workItemQuery = {
             query: "SELECT * FROM WorkItem ORDER BY [System.Id] ASC" 
         };
-
+        
         var tfsItems = [];
         // Executes the WIQL query against the active project
         this.httpClient.queryByWiql(workItemQuery, projectId).then(
@@ -135,7 +190,7 @@ class TFSVisualizer {
                         return that.getWorkItemOrdering(a.fields["System.WorkItemType"]) - that.getWorkItemOrdering(b.fields["System.WorkItemType"])
                     });
                     workItems.forEach(function(workItem : Contracts.WorkItem, index){
-                        if(workItem.fields["System.WorkItemType"] === "Feature"){
+                        if(workItem.fields["System.WorkItemType"] === "Epic"){
                             tree.add(workItem, 'TFS', tree.traverseBF);
                         } else {
                             var parentWorkItem = workItems.find(function(item){
@@ -148,13 +203,19 @@ class TFSVisualizer {
                             tree.add(workItem, parentWorkItem, tree.traverseBF)
                         }
                     })
+
+                    var workItemCounter : any = {
+                        Features: 0,
+                        WorkItems: 0,
+                        Bugs: 0,
+                        Tasks: 0
+                    }
                     
                     var stateDictionary : any = {
                         NotCompleted: 0,
                         Completed: 0,
                         New: 0,
                         "In Progress": 0,
-
                     };
 
                     const callback = (node:TreeNode) => {
@@ -169,9 +230,24 @@ class TFSVisualizer {
                         } else {
                             stateDictionary.NotCompleted++;
                         }
+
+
+                        var workItemType = node.data.fields["System.WorkItemType"];
+                        if(workItemType === "Feature")
+                            workItemCounter.Features++;
+                        if(workItemType === "Work Item" ||workItemType === "Product Backlog Item")
+                            workItemCounter.WorkItems++;
+                        if(workItemType === "Bug")
+                            workItemCounter.Bugs++;
+                        if(workItemType === "Task")
+                            workItemCounter.Tasks++;
                     };
 
                     tree.traverseBF(callback);
+
+                    document.getElementById("totalFeatures").innerText = workItemCounter.Features;
+                    document.getElementById("totalWorkItems").innerText = workItemCounter.WorkItems;
+                    document.getElementById("totalTasks").innerText = workItemCounter.Tasks;
                     
                     var chartDataSet : Chart.ChartDataSets = {
                         label: "Progress",// tree._root.data,//tree._root.data.fields["System.Title"],
@@ -188,6 +264,7 @@ class TFSVisualizer {
                         beginAtZero:true
                     };
 
+
                     var myChart: any = document.getElementById("myChart");
                     var ctx = myChart.getContext('2d');
                     var chart = new Chart(ctx,
@@ -203,14 +280,53 @@ class TFSVisualizer {
                 }).bind(this)); 
         }).bind(this));    
     }
+}
 
-    
+class TFSVisualizer {
+    public getInitatiatives(){
+        var workItemRetriever = new WorkItemRetriever();
+        workItemRetriever.getEpicCategoryItems().then(function(result){
+            result.forEach(function(item, index){
+                var option = document.createElement('option');
+                option.value = item.id.toString();
+                option.appendChild(document.createTextNode(item.fields["System.Title"]));
+                document.getElementById('initiativeSelection').appendChild(option)
+                
+            });
+        });
+    }
 
-
-    public getItemStateGraph(tfsTree){
-        
+    public generateReport(initiativeId){
+        var workItemRetriever = new WorkItemRetriever();
+        workItemRetriever.getWorkItems();
     }
 }
 
+
+
+
+var testing = new ProcessRetriever();
+testing.getProcess();
+
 var visualizer = new TFSVisualizer();
-visualizer.visualize();
+
+
+var workItemRetriever = new WorkItemRetriever();
+workItemRetriever.getEpicCategoryItems().then(function(result){
+    result.forEach(function(item, index){
+        var option = document.createElement('option');
+        option.value = item.id.toString();
+        option.appendChild(document.createTextNode(item.fields["System.Title"]));
+        document.getElementById('initiativeSelection').appendChild(option)
+        
+    });
+});
+
+var initiativeSelection : HTMLSelectElement = <HTMLSelectElement>document.getElementById('initiativeSelection')
+initiativeSelection.onchange = function(){
+    var selectedIndex = initiativeSelection.selectedIndex;
+    var initiativeId = initiativeSelection.options[selectedIndex].value;
+    visualizer.generateReport(initiativeId);
+}
+
+
