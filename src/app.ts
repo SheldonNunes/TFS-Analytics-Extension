@@ -4,7 +4,7 @@
 import Tfs_Work_WebApi = require("TFS/Work/RestClient");
 import WorkItemTrackingClient = require("TFS/WorkItemTracking/RestClient");
 import Contracts = require("TFS/WorkItemTracking/Contracts");
-import { WorkItem } from "TFS/WorkItemTracking/Contracts";
+import { WorkItem, WorkItemExpand, WorkItemQueryResult } from "TFS/WorkItemTracking/Contracts";
 declare var Chart: any;
 
 interface ITFSItem {
@@ -169,30 +169,31 @@ class WorkItemRetriever {
         });
     }
 
-    public getWorkItems(){
+    public getWorkItems(initiativeId){
         var that = this;
-        var tree = new Tree(new TreeNode('TFS'));
         var projectId = VSS.getWebContext().project.id;
 
-        // Retrieves the Work Item Tracking REST client
-        var workItemQuery = {
-            query: "SELECT * FROM WorkItem ORDER BY [System.Id] ASC" 
+        //This gets all children of initiativeId
+        var treeQuery = {
+            query: "select * from WorkItemLinks where (Source.[System.TeamProject] = @project and Source.[System.Id] = " + initiativeId + " and Source.[System.State] <> '') and ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and (Target.[System.TeamProject] = @project and Target.[System.WorkItemType] <> '') mode (Recursive)"
         };
-        
-        var tfsItems = [];
-        // Executes the WIQL query against the active project
-        this.httpClient.queryByWiql(workItemQuery, projectId).then(
-        (function(result) {
-            var workItemIds = result.workItems.map(function (wi) { return wi.id });                
-            this.httpClient.getWorkItems(workItemIds, null, null, 4).then(
+        this.httpClient.queryByWiql(treeQuery, projectId).then(function(result:WorkItemQueryResult){
+            //get the ids of all the child elements            
+            var workItemIds = [];
+            result.workItemRelations.forEach(function(item, index){
+                workItemIds.push(item.target.id)
+            });
+            
+            that.httpClient.getWorkItems(workItemIds, null, null, 4).then(
                 (function (workItems) {
                     workItems.sort(function(a,b) {
                         return that.getWorkItemOrdering(a.fields["System.WorkItemType"]) - that.getWorkItemOrdering(b.fields["System.WorkItemType"])
                     });
+                    
+                    var tree = new Tree(new TreeNode(workItems[0]));
+                    
                     workItems.forEach(function(workItem : Contracts.WorkItem, index){
-                        if(workItem.fields["System.WorkItemType"] === "Epic"){
-                            tree.add(workItem, 'TFS', tree.traverseBF);
-                        } else {
+                        if(index !== 0) {
                             var parentWorkItem = workItems.find(function(item){
                                 if(workItem.relations === undefined)
                                     return false;
@@ -278,7 +279,7 @@ class WorkItemRetriever {
                             }
                         });
                 }).bind(this)); 
-        }).bind(this));    
+        });   
     }
 }
 
@@ -298,7 +299,7 @@ class TFSVisualizer {
 
     public generateReport(initiativeId){
         var workItemRetriever = new WorkItemRetriever();
-        workItemRetriever.getWorkItems();
+        workItemRetriever.getWorkItems(initiativeId);
     }
 }
 
