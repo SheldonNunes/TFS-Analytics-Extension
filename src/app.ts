@@ -121,8 +121,9 @@ class TFSVisualizer {
             };
             
             const callback = (node:TreeNode) => {
-                if(node.data == "TFS")
+                if(node.data.fields["System.WorkItemType"] === "Feature" || node.parent === null)
                     return;
+
                 var workItemState = node.data.fields["System.State"];
                 stateDictionary[workItemState]++;
             
@@ -150,6 +151,8 @@ class TFSVisualizer {
             document.getElementById("totalFeatures").innerText = workItemCounter.Features;
             document.getElementById("totalWorkItems").innerText = workItemCounter.WorkItems;
             document.getElementById("totalTasks").innerText = workItemCounter.Tasks;
+
+            document.getElementById("summaryCompletePercentageIndicator").innerText = Math.round((stateDictionary.Completed / (stateDictionary.NotCompleted + stateDictionary.Completed)) * 100) + "%"
             
             var chartDataSet : Chart.ChartDataSets = {
                 label: "Progress",// tree._root.data,//tree._root.data.fields["System.Title"],
@@ -168,8 +171,6 @@ class TFSVisualizer {
 
             this._chartFactory.CreateChart("summaryCompleteChart", "doughnut", chartData);
 
-
-
             //Create Feature Breakdown
 
             let workItemStateCounter = {
@@ -182,7 +183,7 @@ class TFSVisualizer {
             };
             var counter = 0;
             const featureCallback = (node:TreeNode) => {
-                if(node == tree._root)
+                if(node.data.fields["System.WorkItemType"] === "Feature")
                     return;
 
                 let workItemState = node.data.fields["System.State"];            
@@ -207,13 +208,13 @@ class TFSVisualizer {
             })
 
             var completedDataSet : Chart.ChartDataSets = {
-                label: "Completed",// tree._root.data,//tree._root.data.fields["System.Title"],
+                label: "Completed",
                 data: workItemStateCounter.Completed,
                 backgroundColor: 'rgba(51, 216, 20, 0.70)'
             };
 
             var notCompletedDataSet : Chart.ChartDataSets = {
-                label: "Not Completed",// tree._root.data,//tree._root.data.fields["System.Title"],
+                label: "Not Completed",
                 data: workItemStateCounter.NotCompleted,
                 backgroundColor: 'rgba(109, 109, 109, 0.25)'
             };
