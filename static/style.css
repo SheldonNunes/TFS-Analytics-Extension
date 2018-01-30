@@ -1,17 +1,18 @@
 body {
     font-family: 'Raleway', sans-serif !important;
     overflow-y: auto;
+    overflow: scroll !important; 
 }
 
 ul {
     list-style-type: none;
 }
 
-#myChart {
+#summaryCompleteChart {
     height: 100%;
 }
 
-#myChartPercentageIndicator {
+#summaryCompletePercentageIndicator {
     position: absolute;
     margin: 0;
     margin: none;
