@@ -23,6 +23,12 @@ ul {
     font-size: 3em;
 }
 
+#initiativeSelection {
+    font-size: 2.4em;
+    background-color: #f1f1f1;
+    border:none;
+}
+
 .row {
     margin: auto 40px;
 }
@@ -41,6 +47,10 @@ ul {
 
 .container--seventypercentwidth {
     width: 70%;
+}
+
+.container--fullWidth {
+    width: 100%;
 }
 
 .container--halfwidth {

@@ -1,3 +1,5 @@
+import { ChartOptions, LinearTickOptions } from "chart.js";
+
 declare var Chart: any;
 
 export class ChartFactory {
@@ -15,18 +17,32 @@ export class ChartFactory {
             this._createdCharts.splice(index, 1);
         }
 
+        var chartOptions:ChartOptions = {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            }
+        }
+
+        if(chartType === "bar"){
+            var ticks: LinearTickOptions  = {
+                beginAtZero: true
+            };
+            chartOptions.scales = {
+                yAxes: [{
+                    ticks
+                }]
+            }
+        }
+
         var summaryCompleteChart: any = document.getElementById(canvasId);
         var ctx = summaryCompleteChart.getContext('2d');
         var chart = new Chart(ctx,
                 { type: chartType,
                 data: chartData,
-                options: {
-                    maintainAspectRatio: false,
-                    legend: {
-                        display: false
-                    }
-                }
+                options: chartOptions
             });
+
         this._createdCharts.push(chart);
-    }
+    } 
 }

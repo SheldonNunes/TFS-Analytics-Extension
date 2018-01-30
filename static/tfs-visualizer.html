@@ -21,15 +21,14 @@
         });
     </script>
     <h1>TFS Visualizer</h1>
-    <div>
-        <select id="initiativeSelection">
-        </select>
-    </div>
     <div class="row">
         <div class="dataRowContainer">
             <div class="container container--seventypercentwidth">
+                
                 <div class="initiative-summary">
-                    <h2>Initiative Name</h2>
+                    <select id="initiativeSelection">
+                        <option value="" selected disabled hidden>Select an Initiative</option>
+                    </select>
                     <ul class="summaryPoints">
                         <li>Total Features: <span id="totalFeatures"/></li>
                         <li>Total Work Items: <span id="totalWorkItems"/></li>
@@ -46,7 +45,7 @@
         </div>
 
         <div class="dataRowContainer">
-                <div class="container--fullWidth">
+                <div class="container container--fullWidth">
                     <div class="chart">
                         <canvas id="featureBreakdownChart"></canvas>
                     </div>
