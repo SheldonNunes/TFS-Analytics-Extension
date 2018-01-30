@@ -105,7 +105,7 @@ class TFSVisualizer {
 
     public generateReport(projectId, initiativeId){
         var workItemRetriever = new WorkItemRetriever();
-        workItemRetriever.getWorkItems(projectId, initiativeId).then((function(tree){
+        workItemRetriever.getWorkItems(projectId, initiativeId).then((function(tree:Tree){
             var workItemCounter : any = {
                 Features: 0,
                 WorkItems: 0,
@@ -167,7 +167,62 @@ class TFSVisualizer {
             };
 
             this._chartFactory.CreateChart("summaryCompleteChart", "doughnut", chartData);
-            this._chartFactory.CreateChart("featureBreakdownChart", "bar", chartData);
+
+
+
+            //Create Feature Breakdown
+
+            let workItemStateCounter = {
+                Completed: [],
+                NotCompleted: []
+            }
+            var featureChartData : Chart.ChartData = {
+                labels: [],
+                datasets: []
+            };
+            var counter = 0;
+            const featureCallback = (node:TreeNode) => {
+                if(node == tree._root)
+                    return;
+
+                let workItemState = node.data.fields["System.State"];            
+                if(workItemState === "Done" || workItemState === "Closed") 
+                {
+                    workItemStateCounter.Completed[counter]++;
+                } else {
+                    workItemStateCounter.NotCompleted[counter]++;
+                }
+            };
+
+            var features = tree._root.children;
+            features.forEach(function(feature, index){
+                workItemStateCounter.Completed[counter] = 0;
+                workItemStateCounter.NotCompleted[counter] = 0;
+
+                featureChartData.labels.push(feature.data.fields["System.Title"]);
+                var featureTree = new Tree(feature)
+                featureTree.traverseBF(featureCallback)
+
+                counter++;
+            })
+
+            var completedDataSet : Chart.ChartDataSets = {
+                label: "Completed",// tree._root.data,//tree._root.data.fields["System.Title"],
+                data: workItemStateCounter.Completed,
+                backgroundColor: 'rgba(51, 216, 20, 0.70)'
+            };
+
+            var notCompletedDataSet : Chart.ChartDataSets = {
+                label: "Not Completed",// tree._root.data,//tree._root.data.fields["System.Title"],
+                data: workItemStateCounter.NotCompleted,
+                backgroundColor: 'rgba(109, 109, 109, 0.25)'
+            };
+
+            featureChartData.datasets.push(completedDataSet);
+            featureChartData.datasets.push(notCompletedDataSet);
+
+            this._chartFactory.CreateChart("featureBreakdownChart", "bar", featureChartData);
+
         }).bind(this));
     };
 };

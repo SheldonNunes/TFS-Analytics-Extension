@@ -29,7 +29,11 @@ export class ChartFactory {
                 beginAtZero: true
             };
             chartOptions.scales = {
+                xAxes: [{
+                    stacked: true
+                }],
                 yAxes: [{
+                    stacked: true,
                     ticks
                 }]
             }
