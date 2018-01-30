@@ -9,23 +9,24 @@ export class ChartFactory {
             return false
         });
 
-        if(index === -1){
-            var summaryCompleteChart: any = document.getElementById(canvasId);
-            var ctx = summaryCompleteChart.getContext('2d');
-            var chart = new Chart(ctx,
-                    { type: chartType,
-                    data: chartData,
-                    options: {
-                        maintainAspectRatio: false,
-                        legend: {
-                            display: false
-                        }
-                    }
-                });
-            this._createdCharts.push(chart);
-        } else {
+        if(index !== -1){
             var chart = this._createdCharts[index];
-            chart.data = chartData;
+            chart.destroy();
+            this._createdCharts.splice(index, 1);
         }
+
+        var summaryCompleteChart: any = document.getElementById(canvasId);
+        var ctx = summaryCompleteChart.getContext('2d');
+        var chart = new Chart(ctx,
+                { type: chartType,
+                data: chartData,
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        this._createdCharts.push(chart);
     }
 }
