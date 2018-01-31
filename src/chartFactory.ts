@@ -4,7 +4,7 @@ declare var Chart: any;
 
 export class ChartFactory {
     _createdCharts = [];
-    CreateChart(canvasId: string, chartType: string, chartData: Chart.ChartDataSets) {
+    CreateChart(canvasId: string, chartType: string, chartData: Chart.ChartData) {
         var index = this._createdCharts.findIndex(function(element:Chart) { 
             if(element.canvas.id === canvasId)
                  return true;
