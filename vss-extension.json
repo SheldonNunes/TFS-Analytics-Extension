@@ -1,9 +1,9 @@
 {
     "manifestVersion": 1,
     "id": "tfs-visualizer-extension",
-    "version": "0.1.262",
-    "name": "TFS Visualizer Extensions",
-    "description": "An extension that provides analytics on the throughput and statuses of projects.",
+    "version": "0.1.277",
+    "name": "TFS Visualizer Extension",
+    "description": "An extension that provides analytics on initiatives and completion of tasks.",
     "publisher": "sheldonnunes",
     "targets": [
         {
@@ -11,7 +11,7 @@
             }
         ],
     "icons": {
-        "default": "static/images/logo.png"
+        "default": "static/images/logo.jpg"
      },
     "contributions": [
         {
@@ -49,7 +49,7 @@
             "packagePath": "lib"
         },
         {
-            "path": "static/images/logo.png", "addressable": true
+            "path": "static/images/logo.jpg", "addressable": true
         }
     ]
 }

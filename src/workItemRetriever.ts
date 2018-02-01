@@ -1,4 +1,3 @@
-import Tfs_Work_WebApi = require("TFS/Work/RestClient");
 import WorkItemTrackingClient = require("TFS/WorkItemTracking/RestClient");
 import { Tree, TreeNode } from "./dataStructures/tree";
 import { WorkItem, WorkItemExpand, WorkItemQueryResult } from "TFS/WorkItemTracking/Contracts";

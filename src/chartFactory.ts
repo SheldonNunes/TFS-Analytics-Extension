@@ -4,7 +4,7 @@ declare var Chart: any;
 
 export class ChartFactory {
     _createdCharts = [];
-    CreateChart(canvasId: string, chartType: string, chartData: Chart.ChartData) {
+    CreateChart(canvasId: string, chartType: string, chartData: Chart.ChartData, chartTitle?: string) {
         var index = this._createdCharts.findIndex(function(element:Chart) { 
             if(element.canvas.id === canvasId)
                  return true;
@@ -24,9 +24,17 @@ export class ChartFactory {
             }
         }
 
+        if(chartTitle){
+            chartOptions.title = {
+                display: true,
+                text: chartTitle
+            };
+        }
+
         if(chartType === "bar"){
             var ticks: LinearTickOptions  = {
-                beginAtZero: true
+                beginAtZero: true,
+                stepSize: 1
             };
             chartOptions.scales = {
                 xAxes: [{
@@ -36,7 +44,7 @@ export class ChartFactory {
                     stacked: true,
                     ticks
                 }]
-            }
+            };
         }
 
         var summaryCompleteChart: any = document.getElementById(canvasId);

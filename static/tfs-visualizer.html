@@ -20,37 +20,37 @@
             });
         });
     </script>
-    <h1>TFS Visualizer</h1>
-    <div class="row">
-        <div class="dataRowContainer">
-            <div class="container container--seventypercentwidth">
-                
-                <div class="initiative-summary">
-                    <select id="initiativeSelection">
-                        <option value="" selected disabled hidden>Select an Initiative</option>
-                    </select>
-                    <ul class="summaryPoints">
-                        <li>Total Features: <span id="totalFeatures"/></li>
-                        <li>Total Work Items: <span id="totalWorkItems"/></li>
-                        <li>Total Tasks: <span id="totalTasks"/></li>
-                    </ul>
+    <div class="page">
+        <div class="row">
+            <div class="dataRowContainer">
+                <div class="container container--seventypercentwidth">
+                    <div class="initiative-summary">
+                        <select id="initiativeSelection">
+                            <option value="" selected disabled hidden>Select an Initiative</option>
+                        </select>
+                        <ul class="summaryPoints">
+                            <li>Total Features: <span class="summaryValues" id="totalFeatures"/></li>
+                            <li>Total Work Items: <span class="summaryValues" id="totalWorkItems"/></li>
+                            <li>Total Tasks: <span class="summaryValues" id="totalTasks"/></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <div class="container container--thirtypercentwidth">
-                <div class="chart">
-                    <p id="summaryCompletePercentageIndicator">10%</p>
-                    <canvas id="summaryCompleteChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="dataRowContainer">
-                <div class="container container--fullWidth">
+                <div class="container container--thirtypercentwidth">
                     <div class="chart">
-                        <canvas id="featureBreakdownChart"></canvas>
+                        <p id="summaryCompletePercentageIndicator">10%</p>
+                        <canvas id="summaryCompleteChart"></canvas>
                     </div>
                 </div>
             </div>
+
+            <div class="dataRowContainer">
+                    <div class="container container--fullWidth">
+                        <div class="chart">
+                            <canvas id="featureBreakdownChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+        </div>
     </div>
 </body>
 </html>

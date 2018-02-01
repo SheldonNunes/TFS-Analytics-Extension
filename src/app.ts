@@ -3,6 +3,11 @@ import { ChartFactory } from "./chartFactory";
 import { WorkItemRetriever } from "./workItemRetriever";
 import { WorkItemTypeCounter } from "./workItemTypeCounter";
 import { WorkItemStateCounter } from "./workItemStateCounter";
+import { TFSProcessConfigurationRetriever } from './tfsProcessConfigurationRetriever';
+import { WorkItemClassifier, WorkItemType } from './workItemClassifier';
+
+const CompleteColour = 'rgba(0, 122, 204, 1.0)';
+const NotCompletedColour = 'rgba(109, 109, 109, 0.25)'
 
 class TFSVisualizer {
 
@@ -29,63 +34,8 @@ class TFSVisualizer {
 
     public generateReport(initiativeId){
         this.wiRetriever.getWorkItems(this.projectId, initiativeId).then((function(tree:Tree){  
-            this.generateSummary(tree);                      
-
-
-
-            //Create Feature Breakdown
-
-            let workItemStateCounter = {
-                Completed: [],
-                NotCompleted: []
-            }
-            let featureChartData : Chart.ChartData = {
-                labels: [],
-                datasets: []
-            };
-            let counter = 0;
-            const featureCallback = (node:TreeNode) => {
-                if(node.data.fields["System.WorkItemType"] === "Feature")
-                    return;
-
-                let workItemState = node.data.fields["System.State"];            
-                if(workItemState === "Done" || workItemState === "Closed") 
-                {
-                    workItemStateCounter.Completed[counter]++;
-                } else {
-                    workItemStateCounter.NotCompleted[counter]++;
-                }
-            };
-
-            let features = tree._root.children;
-            features.forEach(function(feature, index){
-                workItemStateCounter.Completed[counter] = 0;
-                workItemStateCounter.NotCompleted[counter] = 0;
-
-                featureChartData.labels.push(feature.data.fields["System.Title"]);
-                let featureTree = new Tree(feature)
-                featureTree.traverseBF(featureCallback)
-
-                counter++;
-            })
-
-            let completedDataSet : Chart.ChartDataSets = {
-                label: "Completed",
-                data: workItemStateCounter.Completed,
-                backgroundColor: 'rgba(51, 216, 20, 0.70)'
-            };
-
-            let notCompletedDataSet : Chart.ChartDataSets = {
-                label: "Not Completed",
-                data: workItemStateCounter.NotCompleted,
-                backgroundColor: 'rgba(109, 109, 109, 0.25)'
-            };
-
-            featureChartData.datasets.push(completedDataSet);
-            featureChartData.datasets.push(notCompletedDataSet);
-
-            this.chartFactory.CreateChart("featureBreakdownChart", "bar", featureChartData);
-
+            this.generateSummary(tree); 
+            this.generateFeatureBreakdown(tree);               
         }).bind(this));
     };
 
@@ -93,10 +43,12 @@ class TFSVisualizer {
         let workItemCounter = new WorkItemTypeCounter();
         let workItemStateCounter = new WorkItemStateCounter();
         const callback = (node:TreeNode) => {
-            if(node.data.fields["System.WorkItemType"] === "Feature" || node.parent === null)
+            let workItemType = WorkItemClassifier.getWorkItemType(node.data)
+            workItemCounter.incrementCounter(workItemType);
+            
+            if(workItemType === WorkItemType.Feature || node.parent === null)
                 return;
 
-            workItemCounter.incrementCounter(node.data.fields["System.WorkItemType"]);
             workItemStateCounter.incrementCounter(node.data.fields["System.State"]);                
         };
         tree.traverseBF(callback);
@@ -107,9 +59,9 @@ class TFSVisualizer {
         document.getElementById("summaryCompletePercentageIndicator").innerText = Math.round((workItemStateCounter.getCompleted() / (workItemStateCounter.getNotCompleted()  + workItemStateCounter.getCompleted() )) * 100) + "%"
 
         let chartDataSet : Chart.ChartDataSets = {
-            label: "Progress",// tree._root.data,//tree._root.data.fields["System.Title"],
+            label: "Progress",
             data: [workItemStateCounter.getCompleted(), workItemStateCounter.getNotCompleted() ],
-            backgroundColor: ['rgba(51, 216, 20, 0.70)', 'rgba(109, 109, 109, 0.25)'] 
+            backgroundColor: [CompleteColour, NotCompletedColour] 
         };
         
         let chartData : Chart.ChartData = {
@@ -123,11 +75,71 @@ class TFSVisualizer {
 
         this.chartFactory.CreateChart("summaryCompleteChart", "doughnut", chartData);
     }
+
+    private generateFeatureBreakdown(tree: Tree) {
+        let workItemStateCounter = {
+            Completed: [],
+            NotCompleted: []
+        }
+        let featureChartData : Chart.ChartData = {
+            labels: [],
+            datasets: []
+        };
+        let counter = 0;
+        const featureCallback = (node:TreeNode) => {
+            let workItemType = WorkItemClassifier.getWorkItemType(node.data)
+            
+            if(workItemType === WorkItemType.Feature)
+                return;
+
+            let workItemState = node.data.fields["System.State"];            
+            if(workItemState === "Done" || workItemState === "Closed") 
+            {
+                workItemStateCounter.Completed[counter]++;
+            } else {
+                workItemStateCounter.NotCompleted[counter]++;
+            }
+        };
+
+        let features = tree._root.children;
+        features.forEach(function(feature, index){
+            workItemStateCounter.Completed[counter] = 0;
+            workItemStateCounter.NotCompleted[counter] = 0;
+
+            featureChartData.labels.push(feature.data.fields["System.Title"]);
+            let featureTree = new Tree(feature)
+            featureTree.traverseBF(featureCallback)
+
+            counter++;
+        })
+
+        let completedDataSet : Chart.ChartDataSets = {
+            label: "Completed",
+            data: workItemStateCounter.Completed,
+            backgroundColor: CompleteColour
+        };
+
+        let notCompletedDataSet : Chart.ChartDataSets = {
+            label: "Not Completed",
+            data: workItemStateCounter.NotCompleted,
+            backgroundColor: NotCompletedColour
+        };
+
+        featureChartData.datasets.push(completedDataSet);
+        featureChartData.datasets.push(notCompletedDataSet);
+
+        this.chartFactory.CreateChart("featureBreakdownChart",  "bar", featureChartData, "Feature Status Breakdown");
+
+    }
 };
+
 
 let chartFactory = new ChartFactory();
 let workItemRetriever = new WorkItemRetriever();
 let projectId = VSS.getWebContext().project.id;
+
+let processConfigurationRetriever = new TFSProcessConfigurationRetriever();
+processConfigurationRetriever.getProjectProcessConfiguration(projectId);
 
 let visualizer = new TFSVisualizer(projectId, chartFactory, workItemRetriever);
 visualizer.getInitatiatives();

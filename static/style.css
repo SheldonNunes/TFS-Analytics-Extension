@@ -12,6 +12,7 @@ ul {
     height: 100%;
 }
 
+
 #summaryCompletePercentageIndicator {
     position: absolute;
     margin: 0;
@@ -29,6 +30,9 @@ ul {
     border:none;
 }
 
+.page {
+    padding-top: 30px;
+}
 .row {
     margin: auto 40px;
 }
@@ -58,7 +62,25 @@ ul {
 }
 
 .summaryPoints {
-    font-size: 2em;
+    font-size: 2.2em;
+    line-height: 2.2;
+}
+
+.summaryValues {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+#totalFeatures { 
+    color: #773b93;
+}
+
+#totalWorkItems {
+    color: #009ccc;
+}
+
+#totalTasks {
+    color: #f2cb1d
 }
 
 .chart {

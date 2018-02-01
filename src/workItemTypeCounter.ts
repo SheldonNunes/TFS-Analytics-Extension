@@ -1,3 +1,4 @@
+import { WorkItemType } from './workItemClassifier';
 
 export class WorkItemTypeCounter {
     private workItemCounter;
@@ -11,9 +12,9 @@ export class WorkItemTypeCounter {
             this.workItemCounter.Features++;
         if(workItemType === WorkItemType.WorkItem)
             this.workItemCounter.WorkItems++;
-        if(workItemType === WorkItemType.Bugs)
+        if(workItemType === WorkItemType.Bug)
             this.workItemCounter.Bugs++;
-        if(workItemType === WorkItemType.Tasks)
+        if(workItemType === WorkItemType.Task)
             this.workItemCounter.Tasks++;
     }
 
@@ -41,11 +42,4 @@ export class WorkItemTypeCounter {
     public getTaskItemCount() {
         return this.workItemCounter.Tasks
     }
-}
-
-enum WorkItemType {
-    Feature,
-    WorkItem,
-    Bugs,
-    Tasks
 }
