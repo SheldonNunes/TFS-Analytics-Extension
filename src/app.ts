@@ -150,3 +150,5 @@ initiativeSelection.onchange = function(){
     let initiativeId = initiativeSelection.options[selectedIndex].value;
     visualizer.generateReport(initiativeId);
 };
+
+VSS.notifyLoadSucceeded();
