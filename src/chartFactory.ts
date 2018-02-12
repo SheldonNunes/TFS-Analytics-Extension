@@ -33,8 +33,7 @@ export class ChartFactory {
 
         if(chartType === "bar"){
             var ticks: LinearTickOptions  = {
-                beginAtZero: true,
-                stepSize: 1
+                beginAtZero: true
             };
             chartOptions.scales = {
                 xAxes: [{

@@ -13,8 +13,9 @@
     "typescript": "^2.6.2"
   },
   "scripts": {
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p . && tfx extension create --output-path dist/ --rev-version"
+    "build": "tsc -p . && tfx extension create --output-path tfx/ --rev-version"
   },
   "keywords": [],
   "author": "",

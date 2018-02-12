@@ -26,8 +26,9 @@ ul {
 
 #initiativeSelection {
     font-size: 2.4em;
-    background-color: #f1f1f1;
+    background-color: #fbfbfb;
     border:none;
+    max-width: 100%;
 }
 
 .page {
@@ -62,8 +63,8 @@ ul {
 }
 
 .summaryPoints {
-    font-size: 2.2em;
-    line-height: 2.2;
+    font-size: 2.0em;
+    line-height: 2.0;
 }
 
 .summaryValues {
@@ -81,6 +82,10 @@ ul {
 
 #totalTasks {
     color: #f2cb1d
+}
+
+#totalBugs {
+    color: #cc293d;
 }
 
 .chart {
