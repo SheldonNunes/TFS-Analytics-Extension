@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="../lib/VSS.SDK.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 <body>
     <script>
@@ -15,42 +16,11 @@
         });
 
         VSS.ready(function () {
-            require(["scripts/app"], function () {
+            require(["scripts/main"], function () {
             });
         });
     </script>
-    <div class="page">
-        <div class="row">
-            <div class="dataRowContainer">
-                <div class="container container--seventypercentwidth">
-                    <div class="initiative-summary">
-                        <select id="initiativeSelection">
-                            <option value="" selected disabled hidden>Select an Initiative</option>
-                        </select>
-                        <ul class="summaryPoints">
-                            <li>Total Features: <span class="summaryValues" id="totalFeatures"/></li>
-                            <li>Total Work Items: <span class="summaryValues" id="totalWorkItems"/></li>
-                            <li>Total Bugs: <span class="summaryValues" id="totalBugs"/></li>                            
-                            <li>Total Tasks: <span class="summaryValues" id="totalTasks"/></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="container container--thirtypercentwidth">
-                    <div class="chart">
-                        <p id="summaryCompletePercentageIndicator"></p>
-                        <canvas id="summaryCompleteChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dataRowContainer">
-                    <div class="container container--fullWidth">
-                        <div class="chart">
-                            <canvas id="featureBreakdownChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-        </div>
+    <div id="app">
     </div>
 </body>
 </html>

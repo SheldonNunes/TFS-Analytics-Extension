@@ -9,13 +9,22 @@
     "vss-web-extension-sdk": "^5.127.0"
   },
   "devDependencies": {
+    "babel": "^6.23.0",
+    "css-loader": "^0.28.9",
+    "style-loader": "^0.20.1",
+    "ts-loader": "^3.5.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "vue": "^2.5.13",
+    "vue-html-loader": "^1.2.4",
+    "vue-loader": "^14.1.1",
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.11.0"
   },
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p . && tfx extension create --output-path tfx/ --rev-version"
+    "build": "webpack && tfx extension create --output-path tfx/ --rev-version"
   },
   "keywords": [],
   "author": "",

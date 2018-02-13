@@ -1,19 +1,25 @@
 {
     "compilerOptions": {
-        "module": "amd",
-        "lib": ["es2017", "dom"],
-        "moduleResolution": "node",
-        "target": "es5",
-        "rootDir": "src/",
-        "outDir": "dist/",
-        "types": [
-            "vss-web-extension-sdk"
-        ]	
+      // this aligns with Vue's browser support
+      "target": "es6",
+      // this enables stricter inference for data properties on `this`
+      "strict": false,
+      // if using webpack 2+ or rollup, to leverage tree shaking:
+
+      "rootDir": "src/",
+      "outDir": "dist/",
+      "module": "amd",
+      "lib": ["es2017", "dom"],
+      "moduleResolution": "node",
+      "types": [
+        "vss-web-extension-sdk"
+    ]	
     },
     "include": [
-      "src/**/*.ts"
+      "src/**/*.ts",
+      "src/**/*.vue"
     ],
     "files": [
-      "src/app.ts"
+      "src/main.ts"
     ]
 }
