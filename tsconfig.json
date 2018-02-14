@@ -11,9 +11,7 @@
       "module": "amd",
       "lib": ["es2017", "dom"],
       "moduleResolution": "node",
-      "types": [
-        "vss-web-extension-sdk"
-    ]	
+      "sourceMap": false
     },
     "include": [
       "src/**/*.ts",

@@ -1,15 +1,17 @@
-import * as WorkItemTrackingClient from "TFS/WorkItemTracking/RestClient";
+/// <reference types="vss-web-extension-sdk" />
+
+import { WorkItemTrackingHttpClient4, getClient } from "TFS/WorkItemTracking/RestClient";
 import { Tree, TreeNode } from "./../dataStructures/tree";
-import { WorkItem, WorkItemExpand, WorkItemQueryResult } from "TFS/WorkItemTracking/Contracts";
+import { WorkItemExpand, WorkItemQueryResult } from "TFS/WorkItemTracking/Contracts";
 import { WorkItemClassifier, WorkItemType } from "./../workItemClassifier"
 import * as Contracts from "TFS/WorkItemTracking/Contracts";
+import { WorkItem } from "./../models/WorkItem";
 
-
-export class WorkItemApi {
-    private _httpClient: WorkItemTrackingClient.WorkItemTrackingHttpClient4;
-    public get httpClient(): WorkItemTrackingClient.WorkItemTrackingHttpClient4 {
+export default class WorkItemApi {
+    private _httpClient: WorkItemTrackingHttpClient4;
+    public get httpClient(): WorkItemTrackingHttpClient4 {
         if (!this._httpClient) {
-            this._httpClient = WorkItemTrackingClient.getClient();
+            this._httpClient = getClient();
         }
     
         return this._httpClient;
@@ -23,10 +25,20 @@ export class WorkItemApi {
         };
 
         var that = this;
-        return new Promise<Contracts.WorkItem[]>(function(resolve, reject) {
+        return new Promise<WorkItem[]>(function(resolve, reject) {
             that.httpClient.queryByWiql(initiatiesQuery, projectId, teamId).then(function(result){
-                var ids = result.workItems.map(function (wi) { return wi.id });  
-                resolve(that.httpClient.getWorkItems(ids, null, null, 1));
+                var ids = result.workItems.map((wi) => { return wi.id });  
+                that.httpClient.getWorkItems(ids, null, null, 1).then((wi) => {
+                    let result = wi.map((x) => {
+                        let workItem: WorkItem = {
+                            id: x.id,
+                            title: x.fields["System.Title"],
+                            type: x.fields["System.WorkItemType"]
+                        }
+                        return workItem
+                    })
+                    resolve(result);
+                })
             });
         });
     }

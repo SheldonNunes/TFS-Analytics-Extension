@@ -9,19 +9,25 @@
     </div>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+    import Vue from 'vue'
+    import Component from 'vue-class-component'
 
-@Component({
-    props: {
-        initiativeId: number
-    }
-})
+    @Component({
+        props: [
+            initiativeId: number
+        ]
+    })
+
+    export default Vue.extend({
+        props: ['initiativeId'],
+        data() {
+            return {
+                initiatives: []
+            }
+        },
+        : number;
 
 
-export default class FeatureBreakdown extends Vue {
-    initiativeId: number;
 
-    
-
-}
+    });
 </script>

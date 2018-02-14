@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "tfs-visualizer-extension",
-    "version": "0.1.413",
+    "version": "0.1.442",
     "name": "TFS Visualizer Extension",
     "description": "An extension that provides analytics on initiatives and completion of tasks.",
     "publisher": "sheldonnunes",

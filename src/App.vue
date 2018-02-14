@@ -5,9 +5,7 @@
                 <div class="dataRowContainer">
                     <div class="container container--seventypercentwidth">
                         <div class="initiative-summary">
-                            <select id="initiativeSelection">
-                                <option value="" selected disabled hidden>Select an Initiative</option>
-                            </select>
+                            <initiative-selector></Initiative-selector>
                             <ul class="summaryPoints">
                                 <li>Total Features: <span class="summaryValues" id="totalFeatures"/></li>
                                 <li>Total Work Items: <span class="summaryValues" id="totalWorkItems"/></li>
@@ -39,12 +37,14 @@
 
 <script lang="ts">
     import Vue from 'vue'
-    // import FeatureBreakdown from "./components/FeatureBreakdown.vue"
+    //import FeatureBreakdown from "./components/FeatureBreakdown.vue"
+    import InitiativeSelector from "./components/InitiativeSelector.vue"
 
     export default {
         name: 'app',
         components: {
-            // FeatureBreakdown
+            // FeatureBreakdown,
+            InitiativeSelector
         }
     }
 </script>
