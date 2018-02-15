@@ -1,35 +1,45 @@
 <template>
     <div>
         <ul class="summaryPoints">
-            <li>Total Features: <span class="summaryValues" id="totalFeatures"/>{{summary.featureCount}}</li>
-            <li>Total Work Items: <span class="summaryValues" id="totalWorkItems"/>{{summary.workItemCount}}</li>
-            <li>Total Bugs: <span class="summaryValues" id="totalBugs"/>{{summary.bugCount}}</li>                            
-            <li>Total Tasks: <span class="summaryValues" id="totalTasks"/>{{summary.taskCount}}</li>
+            <li>Total Features: <span class="summaryValues summaryValues--purple">{{ summary.featureCount }}</span></li>
+            <li>Total Work Items: <span class="summaryValues summaryValues--blue">{{summary.workItemCount}}</span></li>
+            <li>Total Bugs: <span class="summaryValues summaryValues--red">{{summary.bugCount}}</span></li>                            
+            <li>Total Tasks: <span class="summaryValues summaryValues--yellow">{{summary.taskCount}}</span></li>
         </ul>
     </div>
 </template>
 <script lang="ts">
     import Vue from 'vue'
-    import WorkItemApi from "./../api/workItemApi"
 
     export default Vue.extend({
-        props: ['summary'],
-        data() {
-            return {
-                summary: []
-            }
-        },
-        methods: {
-            retrieveEpicCategoryItems : function() {
-                let workItemApi:WorkItemApi = new WorkItemApi();
-                workItemApi.getEpicCategoryItems().then((function(items) {
-                    this.initiatives = items;
-                }).bind(this))
-            }   
-        },
-        mounted() {
-            this.retrieveEpicCategoryItems();
-        }
-
+        props: ['summary']
     });
 </script>
+
+<style scoped>
+    .summaryPoints {
+        font-size: 2.0em;
+        line-height: 2.0;
+    }
+
+    .summaryValues {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .summaryValues--purple { 
+        color: #773b93;
+    }
+
+    .summaryValues--blue {
+        color: #009ccc;
+    }
+
+    .summaryValues--yellow {
+        color: #f2cb1d
+    }
+
+    .summaryValues--red {
+        color: #cc293d;
+    }
+</style>

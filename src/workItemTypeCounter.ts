@@ -1,45 +1,34 @@
 import { WorkItemType } from './workItemClassifier';
+import { Tree, TreeNode } from './dataStructures/tree';
+import { WorkItemClassifier } from './workItemClassifier';
 
-export class WorkItemTypeCounter {
-    private workItemCounter;
-    constructor(){
-        this.resetCounter();
-    }
-
-    public incrementCounter(workItemType:WorkItemType){
-        this.workItemCounter
-        if(workItemType === WorkItemType.Feature)
-            this.workItemCounter.Features++;
-        if(workItemType === WorkItemType.WorkItem)
-            this.workItemCounter.WorkItems++;
-        if(workItemType === WorkItemType.Bug)
-            this.workItemCounter.Bugs++;
-        if(workItemType === WorkItemType.Task)
-            this.workItemCounter.Tasks++;
-    }
-
-    public resetCounter() {
-        this.workItemCounter = {
-            Features: 0,
-            WorkItems: 0,
-            Bugs: 0,
-            Tasks: 0
+class WorkItemTypeCounter {
+    public getWorkItemCountFromTree(tree:Tree) {
+        let count = {
+            featureCount: 0,
+            workItemCount: 0,
+            bugCount: 0,
+            taskCount: 0
         }
-    }
-
-    public getFeatureCount() {
-        return this.workItemCounter.Features
-    }
-
-    public getWorkItemCount() {
-        return this.workItemCounter.WorkItems
-    }
-
-    public getBugItemCount() {
-        return this.workItemCounter.Bugs
-    }
-
-    public getTaskItemCount() {
-        return this.workItemCounter.Tasks
+        let features:TreeNode[] = tree._root.children;
+        count.featureCount = features.length;
+        features.forEach(function(feature, index) {
+            if(feature.children) {
+                feature.children.forEach(function(wi, i) {
+                    if(WorkItemClassifier.getWorkItemType(wi.data) === WorkItemType.WorkItem) {
+                        count.workItemCount += 1;
+                    } else if(WorkItemClassifier.getWorkItemType(wi.data) === WorkItemType.Bug) {
+                        count.bugCount += 1;
+                    }
+                    
+                    if(wi.children) {
+                        count.taskCount += wi.children.length;
+                    }
+                });
+            }
+        })
+        return count;
     }
 }
+
+export const workItemTypeCounter = new WorkItemTypeCounter();

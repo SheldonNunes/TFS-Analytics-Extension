@@ -2,7 +2,6 @@ import { ChartFactory } from "./chartFactory";
 import { Tree, TreeNode } from "./dataStructures/tree";
 import { WorkItemClassifier, WorkItemType } from "./workItemClassifier";
 import { WorkItemStateCounter } from "./workItemStateCounter";
-import { WorkItemTypeCounter } from "./workItemTypeCounter";
 import Vue from 'vue'
 import App from "./App.vue";
 

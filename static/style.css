@@ -62,32 +62,6 @@ ul {
     width: 50%;
 }
 
-.summaryPoints {
-    font-size: 2.0em;
-    line-height: 2.0;
-}
-
-.summaryValues {
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-#totalFeatures { 
-    color: #773b93;
-}
-
-#totalWorkItems {
-    color: #009ccc;
-}
-
-#totalTasks {
-    color: #f2cb1d
-}
-
-#totalBugs {
-    color: #cc293d;
-}
-
 .chart {
     position: relative;
     display: flex;

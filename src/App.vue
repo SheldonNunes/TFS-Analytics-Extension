@@ -5,8 +5,8 @@
                 <div class="dataRowContainer">
                     <div class="container container--seventypercentwidth">
                         <div class="initiative-summary">
-                            <initiative-selector/>
-                            <initiative-summary/>
+                            <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
+                            <initiative-summary v-bind:summary="summary"/>
                         </div>
                     </div>
                     <div class="container container--thirtypercentwidth">
@@ -34,12 +34,35 @@
     import Vue from 'vue'
     //import FeatureBreakdown from "./components/FeatureBreakdown.vue"
     import InitiativeSelector from "./components/InitiativeSelector.vue"
+    import InitiativeSummary from "./components/InitiativeSummary.vue"
+    import { workItemApi } from "./api/workItemApi"
+    import { WorkItemType } from "./workItemClassifier"
+    import { workItemTypeCounter } from "./workItemTypeCounter"
 
     export default {
         name: 'app',
+        data() {
+            return {
+                features: [],
+                summary: {
+                    featureCount: 0,
+                    workItemCount: 0,
+                    bugCount: 0,
+                    taskCount: 0
+                }
+            }
+        },
         components: {
             // FeatureBreakdown,
-            InitiativeSelector
+            InitiativeSelector,
+            InitiativeSummary
+        },
+        methods: {
+            initiativeChanged: function(id) {
+                workItemApi.getWorkItems(id).then((function(tree) {
+                    this.summary = workItemTypeCounter.getWorkItemCountFromTree(tree);
+                }).bind(this));
+            }
         }
     }
 </script>
