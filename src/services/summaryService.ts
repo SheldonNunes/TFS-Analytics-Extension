@@ -14,6 +14,29 @@ class SummaryService {
         }
     }
 
+    public getFeatureSummary(featureNodes:TreeNode[]) {
+        let features = [];
+        featureNodes.forEach(function(node, index) {
+            let feature = {
+                title: node.data.fields["System.Title"],
+                children: []
+            };
+            let featureTree = new Tree(node);
+            featureTree.traverseBF((n) => {
+                if(WorkItemClassifier.getWorkItemType(n.data) === WorkItemType.Feature) {
+                    return;
+                }
+                let tfsItem = {
+                    title: n.data.fields["System.Title"],
+                    state: n.data.fields["System.State"]
+                }
+                feature.children.push(tfsItem);
+            });
+            features.push(feature);
+        })
+        return features;
+    }
+
     private getWorkItemCountFromTree(tree:Tree) {
         let count = {
             featureCount: 0,

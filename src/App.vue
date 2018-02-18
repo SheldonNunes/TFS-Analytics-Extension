@@ -15,11 +15,9 @@
                 </div>
 
                 <div class="dataRowContainer">
-                        <div class="container container--fullWidth">
-                            <div class="chart">
-                                <canvas id="featureBreakdownChart"></canvas>
-                            </div>
-                        </div>
+                    <div class="container container--fullWidth">
+                        <feature-chart v-bind:features="features"></feature-chart>
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,6 +30,7 @@
     //import FeatureBreakdown from "./components/FeatureBreakdown.vue"
     import InitiativeSelector from "./components/InitiativeSelector.vue"
     import InitiativeSummary from "./components/InitiativeSummary.vue"
+    import FeatureChart from "./components/FeatureChart.vue"
     import SummaryChart from "./components/SummaryChart.vue"
     import { workItemApi } from "./api/workItemApi"
     import { summaryService } from "./services/summaryService"
@@ -51,7 +50,8 @@
             // FeatureBreakdown,
             InitiativeSelector,
             InitiativeSummary,
-            SummaryChart
+            SummaryChart,
+            FeatureChart
         },
         methods: {
             initiativeChanged: function(id) {
@@ -59,6 +59,7 @@
                     let summary = summaryService.getSummary(tree);
                     this.summary.itemTypes = summary.itemTypes;
                     this.summary.itemStatuses = summary.itemStatuses;
+                    this.features = tree._root.children;
                 }).bind(this));
             }
         }
