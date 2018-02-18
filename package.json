@@ -6,7 +6,8 @@
   "dependencies": {
     "@types/chart.js": "^2.7.3",
     "chart.js": "^2.7.1",
-    "vss-web-extension-sdk": "^5.127.0"
+    "vss-web-extension-sdk": "^5.127.0",
+    "vue-chartjs": "^3.2.1"
   },
   "devDependencies": {
     "babel": "^6.23.0",

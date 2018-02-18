@@ -6,14 +6,11 @@
                     <div class="container container--seventypercentwidth">
                         <div class="initiative-summary">
                             <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
-                            <initiative-summary v-bind:summary="summary"/>
+                            <initiative-summary v-bind:summary="summary.itemTypes"/>
                         </div>
                     </div>
                     <div class="container container--thirtypercentwidth">
-                        <div class="chart">
-                            <p id="summaryCompletePercentageIndicator"></p>
-                            <canvas id="summaryCompleteChart"></canvas>
-                        </div>
+                        <summary-chart v-bind:statusSummary="summary.itemStatuses"/></summary-chart>
                     </div>
                 </div>
 
@@ -35,9 +32,9 @@
     //import FeatureBreakdown from "./components/FeatureBreakdown.vue"
     import InitiativeSelector from "./components/InitiativeSelector.vue"
     import InitiativeSummary from "./components/InitiativeSummary.vue"
+    import SummaryChart from "./components/SummaryChart.vue"
     import { workItemApi } from "./api/workItemApi"
-    import { WorkItemType } from "./workItemClassifier"
-    import { workItemTypeCounter } from "./workItemTypeCounter"
+    import { summaryService } from "./services/summaryService"
 
     export default {
         name: 'app',
@@ -45,22 +42,23 @@
             return {
                 features: [],
                 summary: {
-                    featureCount: 0,
-                    workItemCount: 0,
-                    bugCount: 0,
-                    taskCount: 0
+                    itemTypes: {},
+                    itemStatuses: {}
                 }
             }
         },
         components: {
             // FeatureBreakdown,
             InitiativeSelector,
-            InitiativeSummary
+            InitiativeSummary,
+            SummaryChart
         },
         methods: {
             initiativeChanged: function(id) {
                 workItemApi.getWorkItems(id).then((function(tree) {
-                    this.summary = workItemTypeCounter.getWorkItemCountFromTree(tree);
+                    let summary = summaryService.getSummary(tree);
+                    this.summary.itemTypes = summary.itemTypes;
+                    this.summary.itemStatuses = summary.itemStatuses;
                 }).bind(this));
             }
         }
