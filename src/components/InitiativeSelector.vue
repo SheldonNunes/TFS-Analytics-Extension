@@ -38,3 +38,14 @@
 
     });
 </script>
+
+<style scoped>
+    #initiativeSelection {
+        font-size: 2.4em;
+        background-color: #fbfbfb;
+        border:none;
+        max-width: 300px;
+        display:block;
+        margin: auto;
+    }
+</style>

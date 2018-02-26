@@ -2,10 +2,10 @@
     <div id="app">
         <div class="page">
             <div class="row">
+                <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
                 <div class="dataRowContainer">
                     <div class="container container--seventypercentwidth">
                         <div class="initiative-summary">
-                            <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
                             <initiative-summary v-bind:summary="summary.itemTypes"/>
                         </div>
                     </div>
@@ -19,6 +19,12 @@
                         <feature-chart v-bind:features="features"></feature-chart>
                     </div>
                 </div>
+                
+                <feature-breakdown 
+                v-for="node in features" 
+                v-bind:key="node.data.id"
+                v-bind:node="node">
+                </feature-breakdown>
             </div>
         </div>
     </div>
@@ -27,7 +33,7 @@
 
 <script lang="ts">
     import Vue from 'vue'
-    //import FeatureBreakdown from "./components/FeatureBreakdown.vue"
+    import FeatureBreakdown from "./components/FeatureBreakdown.vue"
     import InitiativeSelector from "./components/InitiativeSelector.vue"
     import InitiativeSummary from "./components/InitiativeSummary.vue"
     import FeatureChart from "./components/FeatureChart.vue"
@@ -47,10 +53,10 @@
             }
         },
         components: {
-            // FeatureBreakdown,
             InitiativeSelector,
             InitiativeSummary,
             SummaryChart,
+            FeatureBreakdown,
             FeatureChart
         },
         methods: {
@@ -60,6 +66,7 @@
                     this.summary.itemTypes = summary.itemTypes;
                     this.summary.itemStatuses = summary.itemStatuses;
                     this.features = tree._root.children;
+                    console.log(this.features);
                 }).bind(this));
             }
         }
