@@ -1,7 +1,5 @@
 <template>
-    <div class="work-item-container">
-        <img class="hex-bullet" v-if="isCompleted" :src="'images/hex-tick.svg'"/>
-        <img class="hex-bullet" v-else :src="'images/hex-cross.svg'"/>
+    <div v-bind:class="workItemBullet">
         <p class="workItemName">{{ workItem.data.fields["System.Title"] }}</p>
     </div>
 </template>
@@ -20,6 +18,13 @@
                     return true;
                 }
                 return false;
+            },
+            workItemBullet: function() {
+                return {
+                    'work-item-container': true,
+                    'workItemName--cross': !this.isCompleted,
+                    'workItemName--tick' : this.isCompleted
+                }
             }
         }
     });
@@ -27,17 +32,34 @@
 
 <style scoped>
     .work-item-container {
+        margin-top: 12px;
         display: flex;
     }
 
-    .hex-bullet {
-        width: 30px;
-        height: 30px;
+    .workItemName--cross:before {
+        display:inline-block;
+        content:"";        
+        text-indent: -9999px;
+        width:25px;
+        height:25px;
+        background: url('../../static/images/cross-rounded.svg');
+        background-size: 25px 25px;
+    
+    }
+        
+    .workItemName--tick:before {
+        display:inline-block;
+        text-indent: -9999px;
+        content:"";
+        width:25px;
+        height:25px;
+        background: url('../../static/images/tick-rounded.svg');
+        background-size: 25px 25px;        
     }
 
     .workItemName {
-        font-size: 1.2em;
-        line-height: 0.5;
+        font-size: 1.4em;
         text-indent: 10px;
+        margin: 0;
     }
 </style>

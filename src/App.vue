@@ -1,11 +1,12 @@
 <template>
     <div id="app">
         <div class="page">
-            <div class="row">
-                <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
+            <initiative-selector v-on:initiativeChanged="initiativeChanged"/>
+            <div class="row" v-if="initiativeTitle !== ''">
                 <div class="dataRowContainer">
                     <div class="container container--seventypercentwidth">
                         <div class="initiative-summary">
+                            <h2>{{ initiativeTitle }}</h2>
                             <initiative-summary v-bind:summary="summary.itemTypes"/>
                         </div>
                     </div>
@@ -49,7 +50,8 @@
                 summary: {
                     itemTypes: {},
                     itemStatuses: {}
-                }
+                },
+                initiativeTitle: ""
             }
         },
         components: {
@@ -65,6 +67,7 @@
                     let summary = summaryService.getSummary(tree);
                     this.summary.itemTypes = summary.itemTypes;
                     this.summary.itemStatuses = summary.itemStatuses;
+                    this.initiativeTitle = tree._root.data.fields["System.Title"]
                     this.features = tree._root.children;
                     console.log(this.features);
                 }).bind(this));

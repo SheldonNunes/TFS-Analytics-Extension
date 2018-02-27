@@ -8,6 +8,12 @@ ul {
     list-style-type: none;
 }
 
+h2 {
+    font-size: 2em;
+    font-weight: normal;
+    margin: 0;
+}
+
 .page {
     padding-top: 30px;
 }

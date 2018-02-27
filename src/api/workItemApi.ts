@@ -13,19 +13,26 @@ class WorkItemApi {
         if (!this._httpClient) {
             this._httpClient = getClient();
         }
-    
         return this._httpClient;
     }
     
     public getEpicCategoryItems(){
         var projectId = VSS.getWebContext().project.id;
-        var teamId = VSS.getWebContext().team.id;
+        var teamName = VSS.getWebContext().team.name;
+
         var initiatiesQuery = {
-            query: "SELECT * FROM WorkItem WHERE [System.WorkItemType] IN GROUP 'Microsoft.EpicCategory' AND [System.TeamProject] = @project ORDER BY [System.Id] ASC" 
+            query: "SELECT * FROM WorkItems WHERE [System.WorkItemType] IN GROUP 'Microsoft.EpicCategory' AND [System.NodeName] = '"+ teamName +"' ORDER BY [System.Id] ASC" 
         };
 
+        if(teamName === VSS.getWebContext().project.name + " Team") {
+            //Set if we are not in a node
+            var initiatiesQuery = {
+                query: "SELECT * FROM WorkItem WHERE [System.WorkItemType] IN GROUP 'Microsoft.EpicCategory' AND [System.TeamProject] = @project ORDER BY [System.Id] ASC" 
+            };
+        }
+
         return new Promise<WorkItem[]>((function(resolve, reject) {
-            this.httpClient.queryByWiql(initiatiesQuery, projectId, teamId).then((function(result){
+            this.httpClient.queryByWiql(initiatiesQuery, projectId).then((function(result){
                 var ids = result.workItems.map((wi) => { return wi.id });  
                 this.httpClient.getWorkItems(ids, null, null, 1).then((wi) => {
                     let result = wi.map((x) => {
@@ -43,7 +50,6 @@ class WorkItemApi {
     }
 
     public getWorkItems(initiativeId){
-        
         var treeQuery = {
             query: "select * from WorkItemLinks where (Source.[System.TeamProject] = @project and Source.[System.Id] = " + initiativeId + " and Source.[System.State] <> '') and ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and (Target.[System.TeamProject] = @project and Target.[System.WorkItemType] <> '') order by Target.[System.WorkItemType] mode (Recursive)"
         };

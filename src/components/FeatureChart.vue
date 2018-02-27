@@ -7,6 +7,7 @@
 <script lang="ts">
     import StackedBarChart from './StackedBarChart'
     import { summaryService } from './../services/summaryService'
+    import { WorkItemState } from './../helpers/workItemStateHelper'
 
     const CompleteColour = "rgba(0, 122, 204, 1.0)";
     const NotCompletedColour = "rgba(109, 109, 109, 0.25)";
@@ -25,7 +26,7 @@
             completed: function() {
                     return this.statuses.map(x => x.children.reduce((acc, val) => { 
                         let state = val.state;
-                        if(state === "Done") {
+                        if(state === WorkItemState.Completed) {
                             return acc += 1;
                         }
                         return acc;
@@ -34,7 +35,7 @@
             incompleted: function() {
                     return this.statuses.map(x => x.children.reduce((acc, val) => { 
                         let state = val.state;
-                        if(state === "In Progress" || state === "Proposed" || state === "Resolved" || state === "New" ||state === "To Do") {
+                        if(state === WorkItemState.NotCompleted) {
                             return acc += 1;
                         }
                         return acc;

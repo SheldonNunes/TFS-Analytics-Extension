@@ -28,7 +28,7 @@ class SummaryService {
                 }
                 let tfsItem = {
                     title: n.data.fields["System.Title"],
-                    state: n.data.fields["System.State"]
+                    state: workItemStateHelper.getWorkItemState(n.data)
                 }
                 feature.children.push(tfsItem);
             });
@@ -73,11 +73,13 @@ class SummaryService {
         features.forEach(function(feature, index) {
             let featureTree = new Tree(feature);
             featureTree.traverseBF((node) => {
-                let wi = node.data;
-                if(workItemStateHelper.getWorkItemState(wi) === WorkItemState.Completed) {
-                    count.completed += 1;
-                } else {
-                    count.incompleted += 1;
+                if(WorkItemClassifier.getWorkItemType(node.data) !== WorkItemType.Feature) {
+                    let wi = node.data;
+                    if(workItemStateHelper.getWorkItemState(wi) === WorkItemState.Completed) {
+                        count.completed += 1;
+                    } else {
+                        count.incompleted += 1;
+                    }
                 }
             })
         })

@@ -37,6 +37,10 @@ module.exports = {
             options: {
               appendTsSuffixTo: [/\.vue$/]
             }
+        },
+        {
+            test: /\.(png|jpg|gif|svg)$/,
+            loader: 'url-loader'
         }]
     }
 };

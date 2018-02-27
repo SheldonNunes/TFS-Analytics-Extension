@@ -41,7 +41,7 @@
 
 <style scoped>
     #initiativeSelection {
-        font-size: 2.4em;
+        font-size: 2em;
         background-color: #fbfbfb;
         border:none;
         max-width: 300px;
