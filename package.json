@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@types/chart.js": "^2.7.3",
-    "chart.js": "^2.7.1",
+    "@types/chart.js": "^2.7.9",
+    "chart.js": "^2.7.2",
     "vss-web-extension-sdk": "^5.127.0",
     "vue-chartjs": "^3.2.1"
   },
